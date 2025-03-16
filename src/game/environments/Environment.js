@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export class Environment {
   constructor(options = {}) {
@@ -46,7 +47,7 @@ export class Environment {
     
     // Load environment model if provided
     if (this.modelPath) {
-      const loader = new THREE.GLTFLoader(loadingManager);
+      const loader = new GLTFLoader(loadingManager);
       loader.load(
         this.modelPath,
         (gltf) => {

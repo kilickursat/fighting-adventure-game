@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export class Character {
   constructor(options = {}) {
@@ -47,7 +48,7 @@ export class Character {
     this.group = new THREE.Group();
     
     // Load character model using GLTFLoader
-    const loader = new THREE.GLTFLoader(loadingManager);
+    const loader = new GLTFLoader(loadingManager);
     loader.load(
       this.modelPath,
       (gltf) => {

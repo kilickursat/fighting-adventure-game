@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Renderer } from './renderer/Renderer.js';
-import { Input } from './input/Input.js';
+import { Renderer } from './core/Renderer.js';
+import { Input } from './core/Input.js';
 import { SceneManager } from './scenes/SceneManager.js';
 
 export class Game {

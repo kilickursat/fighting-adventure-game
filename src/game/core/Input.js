@@ -49,15 +49,15 @@ export class Input {
   }
   
   _onWheel(event) {
-    this.mouse.wheel = event.deltaY;
+    this.mouse.wheel = Math.sign(event.deltaY);
   }
   
   isKeyPressed(keyCode) {
-    return this.keys[keyCode] === true;
+    return !!this.keys[keyCode];
   }
   
   isMouseButtonPressed(button) {
-    return this.mouse.buttons[button] === true;
+    return !!this.mouse.buttons[button];
   }
   
   getMousePosition() {
@@ -65,17 +65,13 @@ export class Input {
   }
   
   getMouseWheel() {
-    const value = this.mouse.wheel;
+    const wheel = this.mouse.wheel;
+    // Reset wheel after reading
     this.mouse.wheel = 0;
-    return value;
+    return wheel;
   }
   
-  resetStates() {
-    // Reset one-time inputs (useful between frames or scene changes)
-    this.mouse.wheel = 0;
-  }
-  
-  destroy() {
+  dispose() {
     // Remove event listeners
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);

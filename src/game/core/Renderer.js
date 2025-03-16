@@ -38,37 +38,30 @@ export class Renderer {
   }
   
   _setupLighting() {
-    // Ambient light for overall scene illumination
+    // Add ambient light
     const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
     this.scene.add(ambientLight);
     
-    // Directional light for shadows
+    // Add directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 10, 7.5);
+    directionalLight.position.set(10, 10, 10);
     directionalLight.castShadow = true;
-    
-    // Configure shadow properties
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 50;
-    directionalLight.shadow.camera.left = -20;
-    directionalLight.shadow.camera.right = 20;
-    directionalLight.shadow.camera.top = 20;
-    directionalLight.shadow.camera.bottom = -20;
-    
     this.scene.add(directionalLight);
   }
   
-  setScene(scene) {
-    if (scene) {
-      this.scene = scene;
-    }
+  getThreeRenderer() {
+    return this.renderer;
   }
   
   setCamera(camera) {
     if (camera) {
       this.camera = camera;
+    }
+  }
+  
+  setScene(scene) {
+    if (scene) {
+      this.scene = scene;
     }
   }
   
@@ -84,5 +77,18 @@ export class Renderer {
     
     // Update renderer size
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  
+  dispose() {
+    // Remove event listeners
+    window.removeEventListener('resize', this.resize);
+    
+    // Dispose renderer
+    this.renderer.dispose();
+    
+    // Remove canvas from container
+    if (this.renderer.domElement.parentNode) {
+      this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+    }
   }
 } 
