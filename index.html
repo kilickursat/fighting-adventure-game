@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fighting Adventure Game</title>
+  <meta name="description" content="A browser-based 3D fighting adventure game using Three.js">
+  <meta name="keywords" content="fighting game, three.js, browser game, javascript game, action game">
+  <meta name="author" content="kilickursat">
+  <link rel="stylesheet" href="public/styles.css">
+  <link rel="icon" href="public/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <!-- The game will be automatically initialized -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js"></script>
+  <script>
+    // Create game container
+    const container = document.createElement('div');
+    container.id = 'game-container';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.position = 'absolute';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.overflow = 'hidden';
+    document.body.appendChild(container);
+
+    // Display loading message
+    const loadingMessage = document.createElement('div');
+    loadingMessage.style.position = 'absolute';
+    loadingMessage.style.top = '50%';
+    loadingMessage.style.left = '50%';
+    loadingMessage.style.transform = 'translate(-50%, -50%)';
+    loadingMessage.style.color = '#fff';
+    loadingMessage.style.fontSize = '24px';
+    loadingMessage.style.fontFamily = 'Arial, sans-serif';
+    loadingMessage.textContent = 'Welcome to Fighting Adventure Game!';
+    container.appendChild(loadingMessage);
+
+    const subMessage = document.createElement('div');
+    subMessage.style.position = 'absolute';
+    subMessage.style.top = '60%';
+    subMessage.style.left = '50%';
+    subMessage.style.transform = 'translate(-50%, -50%)';
+    subMessage.style.color = '#fff';
+    subMessage.style.fontSize = '18px';
+    subMessage.style.fontFamily = 'Arial, sans-serif';
+    subMessage.textContent = 'Full game requires building with npm. See repository for details.';
+    container.appendChild(subMessage);
+
+    // Create GitHub link
+    const githubLink = document.createElement('a');
+    githubLink.href = 'https://github.com/kilickursat/fighting-adventure-game';
+    githubLink.style.position = 'absolute';
+    githubLink.style.bottom = '20px';
+    githubLink.style.left = '50%';
+    githubLink.style.transform = 'translateX(-50%)';
+    githubLink.style.color = '#3498db';
+    githubLink.style.fontSize = '16px';
+    githubLink.style.fontFamily = 'Arial, sans-serif';
+    githubLink.style.textDecoration = 'none';
+    githubLink.textContent = 'View on GitHub';
+    container.appendChild(githubLink);
+
+    // Create a simple animation using Three.js
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111111);
+    
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+    
+    // Create lighting
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+    
+    // Create rotating objects
+    const objects = [];
+    const geometries = [
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.SphereGeometry(0.5, 16, 16),
+      new THREE.TetrahedronGeometry(0.7),
+      new THREE.TorusGeometry(0.5, 0.2, 16, 32)
+    ];
+    
+    const materials = [
+      new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, metalness: 0.3 }),
+      new THREE.MeshStandardMaterial({ color: 0x3333ff, roughness: 0.7, metalness: 0.3 }),
+      new THREE.MeshStandardMaterial({ color: 0x33ff33, roughness: 0.7, metalness: 0.3 }),
+      new THREE.MeshStandardMaterial({ color: 0xffff33, roughness: 0.7, metalness: 0.3 })
+    ];
+    
+    // Create and position objects
+    for (let i = 0; i < 4; i++) {
+      const mesh = new THREE.Mesh(geometries[i], materials[i]);
+      mesh.position.set(
+        (i % 2 === 0 ? 1.5 : -1.5),
+        (i < 2 ? 1 : -1),
+        0
+      );
+      scene.add(mesh);
+      objects.push(mesh);
+    }
+    
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      objects.forEach((obj, index) => {
+        obj.rotation.x += 0.01 * (index + 1);
+        obj.rotation.y += 0.02 * (index + 1);
+      });
+      
+      renderer.render(scene, camera);
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    animate();
+  </script>
+</body>
+</html> 
