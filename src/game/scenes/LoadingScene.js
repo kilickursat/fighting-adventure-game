@@ -94,8 +94,19 @@ export class LoadingScene {
     // Update UI
     this._updateLoadingUI();
     
+    console.log(`LoadingScene - Asset loaded: ${this.loadingProgress.loaded}/${this.loadingProgress.total} (${Math.floor(this.loadingProgress.percentage)}%)`);
+    
     // Return true if all assets are loaded
-    return this.loadingProgress.loaded >= this.loadingProgress.total;
+    const isComplete = this.loadingProgress.loaded >= this.loadingProgress.total;
+    
+    // If complete, show 100% for a moment before returning
+    if (isComplete) {
+      console.log("LoadingScene - All assets loaded, preparing to transition");
+      this.loadingProgress.percentage = 100;
+      this._updateLoadingUI();
+    }
+    
+    return isComplete;
   }
   
   getThreeScene() {

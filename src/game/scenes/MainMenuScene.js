@@ -36,16 +36,28 @@ export class MainMenuScene {
   }
   
   enter() {
+    console.log("MainMenuScene - enter() called");
+    
     // Create menu
     this.menu = new Menu(this.game.uiContainer, this.game);
     
     // Show main menu
     this.menu.showMainMenu();
+    console.log("MainMenuScene - main menu should be visible now");
     
     // Setup scene if not already done
     if (this.scene.children.length === 0) {
+      console.log("MainMenuScene - setting up scene objects");
       this._setupScene();
     }
+    
+    // Ensure menu is visible
+    setTimeout(() => {
+      if (this.menu) {
+        console.log("MainMenuScene - ensuring menu is visible after delay");
+        this.menu.show();
+      }
+    }, 500);
   }
   
   exit() {

@@ -30,6 +30,8 @@ export class SceneManager {
   }
   
   init() {
+    console.log("SceneManager init - starting with loading scene");
+    
     // Set initial scene to loading
     this.changeScene('loading');
     
@@ -39,12 +41,15 @@ export class SceneManager {
       ...this.scenes.game.getAssetsToLoad() || []
     ];
     
+    console.log("Assets to load:", assetsToLoad.length);
+    
     // Enter loading scene with assets
     const finalAssets = this.scenes.loading.enter(assetsToLoad);
     
     // Start loading assets
     this._loadAssets(finalAssets, () => {
       // When all assets are loaded, transition to main menu
+      console.log("All assets loaded - transitioning to main menu");
       this.changeScene('mainMenu');
     });
   }
@@ -169,20 +174,25 @@ export class SceneManager {
     
     // If no assets to load, complete immediately
     if (!assets || assets.length === 0) {
+      console.log("No assets to load, completing immediately");
       if (onComplete) onComplete();
       return;
     }
+    
+    console.log(`Starting to load ${assets.length} assets`);
     
     // Load each asset
     assets.forEach(asset => {
       const onAssetLoaded = () => {
         loadedCount++;
+        console.log(`Asset loaded: ${loadedCount}/${assets.length}`);
         
         // Update loading progress
         const isComplete = this.scenes.loading.onAssetLoaded();
         
         // Check if all assets are loaded
         if (isComplete && onComplete) {
+          console.log("All assets completed loading");
           onComplete();
         }
       };

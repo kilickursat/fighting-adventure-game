@@ -13,6 +13,20 @@ document.body.appendChild(container);
 
 // Create and start the game
 const game = new Game(container);
+
+// Make sure the HTML loading screen is hidden when the game starts loading
+// This is separate from the in-game loading scene
+const htmlLoadingScreen = document.getElementById('loading-screen');
+if (htmlLoadingScreen) {
+  console.log("Main.js - Found HTML loading screen, will hide after game starts");
+  
+  // Hide the HTML loading screen after a short delay
+  setTimeout(() => {
+    console.log("Main.js - Hiding HTML loading screen now");
+    htmlLoadingScreen.style.display = 'none';
+  }, 1000);
+}
+
 game.start();
 
 // Expose game to console for debugging
