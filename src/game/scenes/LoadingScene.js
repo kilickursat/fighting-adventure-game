@@ -32,15 +32,20 @@ export class LoadingScene {
     // Animation
     this.objects = [];
     this.animationTime = 0;
+    
+    // Debug flag to help with debugging
+    this.debug = true;
   }
   
   enter(assetsToLoad = []) {
+    if (this.debug) console.log("LoadingScene - enter() called with", assetsToLoad.length, "assets");
+    
     // Create loading UI
     this._createLoadingUI();
     
     // Reset progress
     this.loadingProgress = {
-      total: assetsToLoad.length,
+      total: Math.max(1, assetsToLoad.length), // Ensure at least 1 to avoid division by zero
       loaded: 0,
       percentage: 0
     };
@@ -51,14 +56,20 @@ export class LoadingScene {
     // Setup loading animation
     this._setupLoadingAnimation();
     
+    if (this.debug) console.log("LoadingScene - initialized with progress:", this.loadingProgress);
+    
     // Return the list of assets to load
     return assetsToLoad;
   }
   
   exit() {
+    if (this.debug) console.log("LoadingScene - exit() called");
+    
     // Remove loading UI
     if (this.loadingUI) {
-      this.game.uiContainer.removeChild(this.loadingUI);
+      if (this.game.uiContainer.contains(this.loadingUI)) {
+        this.game.uiContainer.removeChild(this.loadingUI);
+      }
       this.loadingUI = null;
     }
     
@@ -69,6 +80,8 @@ export class LoadingScene {
       if (obj.material) obj.material.dispose();
     });
     this.objects = [];
+    
+    if (this.debug) console.log("LoadingScene - exit complete");
   }
   
   update(delta) {
@@ -89,19 +102,19 @@ export class LoadingScene {
   onAssetLoaded() {
     // Update progress
     this.loadingProgress.loaded++;
-    this.loadingProgress.percentage = (this.loadingProgress.loaded / this.loadingProgress.total) * 100;
+    this.loadingProgress.percentage = Math.min(100, (this.loadingProgress.loaded / this.loadingProgress.total) * 100);
     
     // Update UI
     this._updateLoadingUI();
     
-    console.log(`LoadingScene - Asset loaded: ${this.loadingProgress.loaded}/${this.loadingProgress.total} (${Math.floor(this.loadingProgress.percentage)}%)`);
+    if (this.debug) console.log(`LoadingScene - Asset loaded: ${this.loadingProgress.loaded}/${this.loadingProgress.total} (${Math.floor(this.loadingProgress.percentage)}%)`);
     
     // Return true if all assets are loaded
     const isComplete = this.loadingProgress.loaded >= this.loadingProgress.total;
     
     // If complete, show 100% for a moment before returning
     if (isComplete) {
-      console.log("LoadingScene - All assets loaded, preparing to transition");
+      if (this.debug) console.log("LoadingScene - All assets loaded, preparing to transition");
       this.loadingProgress.percentage = 100;
       this._updateLoadingUI();
     }
@@ -199,17 +212,27 @@ export class LoadingScene {
     document.head.appendChild(style);
     
     // Add to the UI container
-    this.game.uiContainer.appendChild(this.loadingUI);
+    if (this.game.uiContainer) {
+      this.game.uiContainer.appendChild(this.loadingUI);
+      if (this.debug) console.log("LoadingScene - UI added to container");
+    } else {
+      console.error("LoadingScene - UI container not available");
+    }
   }
   
   _updateLoadingUI() {
-    if (!this.loadingUI) return;
+    if (!this.loadingUI) {
+      if (this.debug) console.log("LoadingScene - No UI to update");
+      return;
+    }
     
     // Update loading bar
     this.loadingBar.style.width = `${this.loadingProgress.percentage}%`;
     
     // Update text
     this.loadingText.textContent = `Loading assets... ${Math.floor(this.loadingProgress.percentage)}%`;
+    
+    if (this.debug) console.log("LoadingScene - UI updated to", Math.floor(this.loadingProgress.percentage) + "%");
   }
   
   _setupLoadingAnimation() {
@@ -247,6 +270,8 @@ export class LoadingScene {
       this.scene.add(mesh);
       this.objects.push(mesh);
     }
+    
+    if (this.debug) console.log("LoadingScene - Animation setup complete with", this.objects.length, "objects");
   }
   
   onResize() {
@@ -272,6 +297,7 @@ export class LoadingScene {
   
   dispose() {
     // Clean up resources
+    if (this.debug) console.log("LoadingScene - dispose() called");
     
     // Remove loading UI
     if (this.loadingUI && this.loadingUI.parentNode) {
@@ -285,4 +311,4 @@ export class LoadingScene {
       if (obj.material) obj.material.dispose();
     });
   }
-} 
+}
