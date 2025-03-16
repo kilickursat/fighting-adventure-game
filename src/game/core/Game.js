@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { Renderer } from './Renderer.js';
 import { Input } from './Input.js';
 import { MainMenuScene } from '../scenes/MainMenuScene.js';
