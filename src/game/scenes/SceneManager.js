@@ -8,6 +8,9 @@ export class SceneManager {
     this.game = game;
     this.renderer = renderer;
     
+    // Debug flag
+    this.debug = true;
+    
     // Initialize scenes
     this.scenes = {
       loading: new LoadingScene(game),
@@ -27,31 +30,35 @@ export class SceneManager {
     
     // Create transition overlay
     this._createTransitionOverlay();
+    
+    if (this.debug) console.log("SceneManager - Initialized with scenes:", Object.keys(this.scenes));
   }
   
   init() {
-    console.log("SceneManager init - starting with loading scene");
+    if (this.debug) console.log("SceneManager init - starting with loading scene");
     
     // Set initial scene to loading
     this.changeScene('loading');
     
     // Get assets to load
-    const assetsToLoad = [
-      ...this.scenes.mainMenu.getAssetsToLoad() || [],
-      ...this.scenes.game.getAssetsToLoad() || []
-    ];
+    const mainMenuAssets = this.scenes.mainMenu.getAssetsToLoad() || [];
+    const gameAssets = this.scenes.game.getAssetsToLoad() || [];
+    const assetsToLoad = [...mainMenuAssets, ...gameAssets];
     
-    console.log("Assets to load:", assetsToLoad.length);
+    if (this.debug) console.log("Assets to load:", assetsToLoad.length);
     
-    // Enter loading scene with assets
-    const finalAssets = this.scenes.loading.enter(assetsToLoad);
-    
-    // Start loading assets
-    this._loadAssets(finalAssets, () => {
-      // When all assets are loaded, transition to main menu
-      console.log("All assets loaded - transitioning to main menu");
-      this.changeScene('mainMenu');
-    });
+    // Add a small delay before entering loading scene to ensure DOM is ready
+    setTimeout(() => {
+      // Enter loading scene with assets
+      const finalAssets = this.scenes.loading.enter(assetsToLoad);
+      
+      // Start loading assets
+      this._loadAssets(finalAssets, () => {
+        // When all assets are loaded, transition to main menu
+        if (this.debug) console.log("All assets loaded - transitioning to main menu");
+        this.changeScene('mainMenu');
+      });
+    }, 100);
   }
   
   update(delta) {
@@ -68,6 +75,7 @@ export class SceneManager {
       } else if (this.transitionTime < this.transitionDuration * 2) {
         // Execute callback at midpoint (scene change)
         if (this.transitionCallback && progress >= 1) {
+          if (this.debug) console.log("SceneManager - Executing transition callback");
           this.transitionCallback();
           this.transitionCallback = null;
         }
@@ -79,6 +87,7 @@ export class SceneManager {
         this.isTransitioning = false;
         this.transitionOverlay.style.opacity = '0';
         this.transitionOverlay.style.pointerEvents = 'none';
+        if (this.debug) console.log("SceneManager - Transition complete to scene:", this.activeScene?.constructor.name);
       }
     }
     
@@ -103,7 +112,12 @@ export class SceneManager {
   
   changeScene(sceneName, options = {}) {
     // Skip if already on this scene
-    if (this.activeScene === this.scenes[sceneName]) return;
+    if (this.activeScene === this.scenes[sceneName]) {
+      if (this.debug) console.log(`SceneManager - Already on scene ${sceneName}, skipping change`);
+      return;
+    }
+    
+    if (this.debug) console.log(`SceneManager - Changing scene to ${sceneName}`);
     
     // Store previous scene
     this.previousScene = this.activeScene;
@@ -120,6 +134,7 @@ export class SceneManager {
     this.transitionCallback = () => {
       // Exit previous scene
       if (this.previousScene) {
+        if (this.debug) console.log(`SceneManager - Exiting previous scene: ${this.previousScene.constructor.name}`);
         this.previousScene.exit();
       }
       
@@ -130,6 +145,7 @@ export class SceneManager {
       if (this.activeScene) {
         if (sceneName === 'game' && options.setupOptions) {
           // Setup game scene with character and environment
+          if (this.debug) console.log(`SceneManager - Entering game scene with setup options`);
           this.activeScene.enter();
           this.activeScene.setupFight(
             options.setupOptions.characterId,
@@ -137,6 +153,7 @@ export class SceneManager {
           );
         } else {
           // Regular scene entry
+          if (this.debug) console.log(`SceneManager - Entering scene: ${sceneName}`);
           this.activeScene.enter();
         }
       }
@@ -166,7 +183,11 @@ export class SceneManager {
     this.transitionOverlay.style.zIndex = '10000';
     
     // Add to UI container
-    this.game.uiContainer.appendChild(this.transitionOverlay);
+    if (this.game.uiContainer) {
+      this.game.uiContainer.appendChild(this.transitionOverlay);
+    } else {
+      console.error("SceneManager - No UI container available for transition overlay");
+    }
   }
   
   _loadAssets(assets, onComplete) {
@@ -174,26 +195,29 @@ export class SceneManager {
     
     // If no assets to load, complete immediately
     if (!assets || assets.length === 0) {
-      console.log("No assets to load, completing immediately");
+      if (this.debug) console.log("No assets to load, completing immediately");
       if (onComplete) onComplete();
       return;
     }
     
-    console.log(`Starting to load ${assets.length} assets`);
+    if (this.debug) console.log(`Starting to load ${assets.length} assets`);
     
     // Load each asset
     assets.forEach(asset => {
       const onAssetLoaded = () => {
         loadedCount++;
-        console.log(`Asset loaded: ${loadedCount}/${assets.length}`);
+        if (this.debug) console.log(`Asset loaded: ${loadedCount}/${assets.length}`);
         
         // Update loading progress
         const isComplete = this.scenes.loading.onAssetLoaded();
         
         // Check if all assets are loaded
         if (isComplete && onComplete) {
-          console.log("All assets completed loading");
-          onComplete();
+          if (this.debug) console.log("All assets completed loading");
+          // Add a small delay before completing to ensure UI updates
+          setTimeout(() => {
+            onComplete();
+          }, 500);
         }
       };
       
@@ -221,4 +245,4 @@ export class SceneManager {
       this.transitionOverlay.parentNode.removeChild(this.transitionOverlay);
     }
   }
-} 
+}
