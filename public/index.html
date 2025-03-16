@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fighting Adventure Game</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Browser favicon - works across all browsers -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <!-- Remove favicon references that are causing errors -->
   <!-- Meta tags for better SEO -->
   <meta name="description" content="A browser-based 3D fighting adventure game using Three.js">
   <meta name="keywords" content="fighting game, three.js, browser game, javascript game, action game">
@@ -19,7 +17,8 @@
       <div class="progress-bar">
         <div class="progress"></div>
       </div>
-      <p>Loading assets...</p>
+      <p>Loading assets... <span id="loading-text">0%</span></p>
+      <p id="loading-tip">TIP: Press 1, 2, or 3 to use special skills!</p>
     </div>
   </div>
   
@@ -31,4 +30,4 @@
     <!-- UI elements will be added here -->
   </div>
 </body>
-</html> 
+</html>
